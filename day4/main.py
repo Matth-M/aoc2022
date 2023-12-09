@@ -1,64 +1,58 @@
-"""DAY4 AOC"""
+def is_one_contained(ranges: list[list[int]]) -> bool:
+    if ranges[0][0] <= ranges[1][0] and ranges[0][1] >= ranges[1][1]:
+        return True
+    if ranges[1][0] <= ranges[0][0] and ranges[1][1] >= ranges[0][1]:
+        return True
+    return False
 
 
-def letter_priority(letter: str):
-    if len(letter) != 1:
-        raise ValueError("Input should be a single letter")
-    if letter.islower():
-        offset = 96
+def overlaps(ranges: list[list[int]]) -> bool:
+    [bot_1, up_1] = ranges[0]
+    [bot_2, up_2] = ranges[1]
+    if up_2 < bot_1 or up_1 < bot_2:
+        return False
     else:
-        offset = 64 - 26  # Capital letters start at a priority of A: 27
-    return ord(letter) - offset
-
-
-def find_common_letter(backpack: str) -> str:
-    half_backpack_len = len(backpack) // 2
-    compartments = [
-        list(backpack[:half_backpack_len]),
-        list(backpack[half_backpack_len:]),
-    ]
-
-    for letter in compartments[0]:
-        if letter in compartments[1]:
-            return letter
-    raise ValueError("Incorrect input")
-
-
-def common_letter_multiple_backpacks(backpacks: list[str]) -> str:
-    for letter in backpacks[0]:
-        if letter in backpacks[1] and letter in backpacks[2]:
-            return letter
-    return ""
-
-
-def part_one(filename: str) -> int:
-    with open(filename, "r", encoding="utf-8") as file:
-        lines = [line.rstrip() for line in file.readlines()]
-
-    score = 0
-    for backpack in lines:
-        common_letter = find_common_letter(backpack)
-        score += letter_priority(common_letter)
-    return score
+        return True
 
 
 def part_two(filename: str) -> int:
     with open(filename, "r", encoding="utf-8") as file:
         lines = [line.rstrip() for line in file.readlines()]
+    result = 0
+    for line in lines:
+        ranges = line.split(",")
+        ranges = [range.split("-") for range in ranges]
+        ranges = [
+            [int(start), int(end)]
+            for range_ in ranges
+            if (start := range_[0].strip()) and (end := range_[1].strip())
+        ]
+        if overlaps(ranges):
+            result += 1
+    return result
 
-    score = 0
-    for i in range(0, len(lines) - 1, 3):
-        backpacks = [lines[i], lines[i + 1], lines[i + 2]]
-        common_letter = common_letter_multiple_backpacks(backpacks)
-        score += letter_priority(common_letter)
 
-    return score
+def part_one(filename: str) -> int:
+    with open(filename, "r", encoding="utf-8") as file:
+        lines = [line.rstrip() for line in file.readlines()]
+    result = 0
+    for line in lines:
+        ranges = line.split(",")
+        ranges = [range.split("-") for range in ranges]
+        ranges = [
+            [int(start), int(end)]
+            for range_ in ranges
+            if (start := range_[0].strip()) and (end := range_[1].strip())
+        ]
+        if is_one_contained(ranges):
+            result += 1
+    return result
 
 
 if __name__ == "__main__":
     input_file = "./input.txt"
     score = part_one(input_file)
-    print(score)
+    print("part_one", score)
 
     score = part_two(input_file)
-    print(score)
+    print("part_two", score)
